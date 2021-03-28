@@ -165,8 +165,9 @@ if __name__ == "__main__":
     mdl.load_state_dict(torch.load(f'../models/{best_acc}acc_{min_val_loss}loss.pth'))
     mdl.eval()
     preds_list = []
+    preds_list = []
     with torch.no_grad():
-        for i, row in df.iterrows():            
+        for i, row in df.iterrows(): 
             review = [row['comments']]
             tokens = tokenizer.batch_encode_plus(
                 review,
@@ -177,7 +178,8 @@ if __name__ == "__main__":
             ids = torch.tensor(tokens['input_ids'], dtype=torch.long).to(device)
             mask = torch.tensor(tokens['attention_mask'], dtype=torch.long).to(device)
             preds = mdl(ids, mask)
-            preds = list(outputs.cpu().detach().numpy().flatten())
-            preds_list += preds
+            
+            preds = preds.cpu().detach().numpy().flatten()
+            preds_list.append(preds[0])
     df['mdl_preds'] = preds_list
     df.to_csv('../data/processed/order_reviews_sentiment_analysis.csv', index=False)
